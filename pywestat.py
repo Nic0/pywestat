@@ -37,16 +37,47 @@ import logging
 import pymetar
 import datetime
 import threading
+import ConfigParser
 from urllib2 import URLError
 
 def current_line():
     return inspect.currentframe().f_back.f_lineno
 
+class Configuration(object):
+
+    def __init__(self):
+        try:
+            self.conf_home = os.environ['XDG_CONFIG_HOME'] + '/pywestat'
+            self.conf_file = self.conf_home + '/pywestat.conf'
+        except KeyError:
+            self.conf_home = os.environ['HOME'] + '.config/pywestat'
+            self.conf_file = self.conf_home + '/pywestat.conf'
+        self.check_default_config()
+        self.read()
+
+    def check_default_config(self):
+        if not os.path.isfile(self.conf_file):
+            if not os.path.exists(self.conf_home):
+                os.makedirs(self.conf_home)
+            print 'no configuration file found, \n\
+I need the station Ids, Station IDs can be found at: http://www.nws.noaa.gov/tg/siteloc.shtml\n\
+The configuration file is: %s\n\
+You should write something like:\n\
+\n\
+[conf]\n\
+station = LFRK\n' % (self.conf_file)
+            sys.exit(1)
+
+    def read(self):
+        conf = ConfigParser.RawConfigParser()
+        conf.read(self.conf_file)
+        self.station = conf.get('conf', 'station')
+
 class DataHandler(object):
     """serialize datas with pickler"""
 
-    def __init__(self):
-        self.datafile = 'weather.db'
+    def __init__(self, filename):
+        self.datafile = filename
         self.load()
 
     def load(self):
@@ -160,13 +191,14 @@ class Interface(object):
     """Main entry point for the interface display and for the entire program"""
 
     def __init__(self):
-        self.station = 'LFRK'
         self.item = []
-        self.report = self.retrieve_report()
         self.init_prog()
 
     def init_prog(self):
-        self.datahandler = DataHandler()
+        self.conf = Configuration()
+        self.station = self.conf.station
+        self.report = self.retrieve_report()
+        self.datahandler = DataHandler(self.conf.conf_home + '/pywestat.db')
         self.init_logging()
         self.init_unit()
         self.init_palette()
@@ -175,7 +207,7 @@ class Interface(object):
 
     def init_logging(self):
         logging.basicConfig(
-            filename='weather.log',
+            filename=self.conf.conf_home + '/pywestat.log',
             level=logging.DEBUG,
             format='%(asctime)s %(levelname)s - %(message)s',
             datefmt='%d/%m/%Y %H:%M:%S',
