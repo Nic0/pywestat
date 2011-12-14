@@ -7,6 +7,10 @@ Curently under developpment.
 
 ![pywestat][id]
 
+##CONFIGURATION
+
+Follow indications on the first start, it will be more handly soon, promise
+
 ##DEPENDENCIES
 
 - pymetar
