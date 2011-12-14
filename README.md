@@ -5,7 +5,7 @@ records, will gives graphics from the database obtain.
 
 Curently under developpment.
 
-![pywestat](./pywestat.png)
+![pywestat][id]
 
 ##DEPENDENCIES
 
@@ -20,3 +20,5 @@ site: http://www.nicosphere.net
 ##Licence
 
 BSD Licence
+
+[id]: http://pix.toile-libre.org/upload/original/1323883244.png
