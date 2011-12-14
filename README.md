@@ -5,6 +5,8 @@ records, will gives graphics from the database obtain.
 
 Curently under developpment.
 
+![pywestat](pywestat.png)
+
 ##DEPENDENCIES
 
 - pymetar
